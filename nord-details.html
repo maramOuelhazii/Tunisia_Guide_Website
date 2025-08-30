@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nord de la Tunisie</title>
+    <style>
+        /* Styles cohérents avec votre site */
+        :root {
+            --primary: #2980b9;
+            --secondary: #e62222;
+            --light: #f9f9f9;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+        
+         /* Header transparent */
+         header {
+            background: var(--primary);
+            padding: 15px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-left img {
+            height: 50px;
+            width: auto;
+            border-radius: 0.2cm;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+        }
+        
+        nav a:hover {
+            color: #e62222;
+            transition: color 0.3s ease-in-out;
+        }
+        
+        /* Conteneur principal du dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Bouton du menu déroulant */
+        .dropdown-toggle {
+            background: none;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .dropdown-toggle:hover {
+            color: #e62222;
+        }
+
+        /* Contenu du menu déroulant */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            background: rgba(255, 255, 255, 0.2); /* Transparence */
+            backdrop-filter: blur(5px); /* Effet flou pour lisibilité */
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        /* Options du menu déroulant */
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: #e62222;
+            color: white;
+        }
+
+        /* Afficher le menu au survol */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar {
+            padding: 8px 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus {
+            width: 250px;
+            box-shadow: 0 0 10px rgba(230, 34, 34, 0.6);
+        }
+        
+        .search-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: -35px;
+        }
+
+        /* Hero Section */
+        .region-hero {
+            height: 50vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('nord.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+        
+        .region-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .region-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .intro-text {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+        
+        .intro-text p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Cards Grid - Style amélioré */
+        .regions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .region-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .region-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .region-img {
+            height: 250px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .region-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .region-title {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .region-desc {
+            color: #555;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .btn-container {
+            text-align: right;
+        }
+        
+        .see-more-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .see-more-btn:hover {
+            background: var(--secondary);
+        }
+        
+        /* Section Map */
+        .map-section {
+            margin: 60px 0;
+            text-align: center;
+        }
+        
+        .map-section h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        #nord-map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header transparent -->
+    <header>
+        <nav>
+            <div class="nav-left">
+                <img src="flag.png" alt="Drapeau de la Tunisie" height="50px">
+            </div>
+            <div class="nav-right">
+                <a href="projet.html" class="active">Accueil</a>
+                <!-- Dropdown menu -->
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle">Destination</a>
+                    <div class="dropdown-content">
+                        <a href="nord-details.html">Nord</a>
+                        <a href="centre.html">Centre</a>
+                        <a href="sud.html">Sud</a>
+                    </div>
+                </div>       
+                <a href="contact.html">Contact</a>
+                <div class="search-container">
+                    <input type="text" placeholder="Rechercher..." class="search-bar">
+                    <button class="search-button">🔍</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="region-hero">
+        <h1>Nord de la Tunisie</h1>
+        <p>Découvrez les joyaux méditerranéens entre histoire millénaire et plages paradisiaques</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="intro-text">
+            <p>Le nord de la Tunisie vous offre un mélange unique entre sites historiques classés à l'UNESCO, villages pittoresques et stations balnéaires réputées. Entre mer et montagne, cette région au climat méditerranéen est une invitation au voyage.</p>
+        </div>
+        
+        <div class="regions-grid">
+            <!-- Tunis -->
+            <div class="region-card">
+                <img src="tunis.jpg" alt="Tunis" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Tunis</h3>
+                    <p class="region-desc">La capitale vibrante alliant <span class="highlight">médina historique</span> et modernité. Ne manquez pas le musée du Bardo et la célèbre avenue Habib Bourguiba, artère principale bordée de cafés parisiens.</p>
+                    <div class="btn-container">
+                        <a href="tunis.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- jendouba -->
+            <div class="region-card">
+                <img src="Jendouba.jpg" alt="jendouba" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">jendouba</h3>
+                    <p class="region-desc">Jendouba est une ville agricole du Nord-Ouest tunisien, marquée par son souk hebdomadaire et son architecture méditerranéenne. Elle se développe aussi industriellement, près de sites comme Bulla Regia et le parc El Feidja..</p>
+                    <div class="btn-container">
+                        <a href="jendouba.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidi Bou Saïd -->
+            <div class="region-card">
+                <img src="sidibou.jpg" alt="Sidi Bou Saïd" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Sidi Bou Saïd & Carthage</h3>
+                    <p class="region-desc">Village emblématique aux <span class="highlight">murs bleus et blancs</span>, offrant une vue imprenable sur la Méditerranée. Perdez-vous dans ses ruelles pavées et ses cafés mauresques.</p>
+                    <div class="btn-container">
+                        <a href="sidi-bou-said.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bizerte -->
+            <div class="region-card">
+                <img src="bizerte.jpg" alt="Bizerte" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Bizerte</h3>
+                    <p class="region-desc">Port stratégique avec sa <span class="highlight">vieille ville andalouse</span>, ses plages de sable fin et son lac pittoresque. Découvrez son mélange unique d'influences culturelles.</p>
+                    <div class="btn-container">
+                        <a href="bizerte.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hammamet -->
+            <div class="region-card">
+                <img src="hammamet.jpg" alt="Hammamet" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Hammamet</h3>
+                    <p class="region-desc">Station balnéaire réputée pour ses <span class="highlight">plages dorées</span>, ses hôtels de luxe et son parc d'attractions jendouba Land. Paradis des vacances en famille.</p>
+                    <div class="btn-container">
+                        <a href="hammamet.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabarka -->
+            <div class="region-card">
+                <img src="tabarka.jpg" alt="Tabarka" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Tabarka</h3>
+                    <p class="region-desc">Station balnéaire réputée pour son <span class="highlight">rocher sculpté</span>, son festival international de jazz et ses fonds marins exceptionnels pour la plongée sous-marine.</p>
+                    <div class="btn-container">
+                        <a href="tabarka.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Map Section -->
+        <div class="map-section">
+            <h2>Carte des sites incontournables</h2>
+            <div class="map-container">
+                <div id="nord-map"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS pour la carte -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialisation de la carte
+        const map = L.map('nord-map').setView([36.8, 10.1], 9);
+        
+        // Ajout des tuiles OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Ajout des marqueurs pour chaque ville
+        const cities = [
+            {
+                name: "Tunis",
+                coords: [36.8008, 10.1800],
+                description: "Capitale de la Tunisie",
+                icon: "city"
+            },
+            {
+                name: "Jendouba",
+                coords: [36.5011, 8.7803],
+                description: "Ville du Nord-Ouest tunisien",
+                icon: "historic"
+            },
+            {
+                name: "Sidi Bou Saïd",
+                coords: [36.8687, 10.3418],
+                description: "Village bleu et blanc",
+                icon: "village"
+            },
+            {
+                name: "Bizerte",
+                coords: [37.2745, 9.8739],
+                description: "Port andalou",
+                icon: "port"
+            },
+            {
+                name: "Hammamet",
+                coords: [36.4000, 10.6167],
+                description: "Station balnéaire",
+                icon: "beach"
+            },
+            {
+                name: "Tabarka",
+                coords: [36.9544, 8.7581],
+                description: "Spot de plongée",
+                icon: "diving"
+            }
+        ];
+        
+        // Icônes personnalisées (simplifiées)
+        const iconUrls = {
+            city: "https://cdn-icons-png.flaticon.com/512/484/484167.png",
+            historic: "https://cdn-icons-png.flaticon.com/512/2077/2077926.png",
+            village: "https://cdn-icons-png.flaticon.com/512/619/619153.png",
+            port: "https://cdn-icons-png.flaticon.com/512/3130/3130313.png",
+            beach: "https://cdn-icons-png.flaticon.com/512/3464/3464118.png",
+            diving: "https://cdn-icons-png.flaticon.com/512/3163/3163478.png"
+        };
+        
+        // Ajout des marqueurs sur la carte
+        cities.forEach(city => {
+            const customIcon = L.icon({
+                iconUrl: iconUrls[city.icon],
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+            
+            L.marker(city.coords, {icon: customIcon})
+                .addTo(map)
+                .bindPopup(`<b>${city.name}</b><br>${city.description}`);
+        });
+    </script>
+</body>
+</html>
