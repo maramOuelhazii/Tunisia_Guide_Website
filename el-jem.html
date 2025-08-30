@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Jem - Joyau Romain de Tunisie</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <style>
+        :root {
+            --primary: #2980b9;
+            --secondary: #e62222;
+            --light: #f9f9f9;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: var(--primary);
+            padding: 15px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-left img {
+            height: 50px;
+            width: auto;
+            border-radius: 0.2cm;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+        }
+        
+        nav a:hover {
+            color: var(--secondary);
+            transition: color 0.3s ease-in-out;
+        }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle {
+            background: none;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .dropdown-toggle:hover {
+            color: var(--secondary);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar {
+            padding: 8px 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus {
+            width: 250px;
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.6);
+        }
+        
+        .search-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: -35px;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-3px);
+        }
+        
+        .back-btn i {
+            margin-right: 5px;
+        }
+        
+        .city-hero {
+            height: 50vh;
+            min-height: 400px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)), url('eljem-hero.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+        
+        .city-hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.8rem;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .city-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+        }
+        
+        .section-title h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: inline-block;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 5px;
+        }
+        
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .highlight-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .highlight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .card-content h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        
+        .card-content p {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        #eljem-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-card h3 i {
+            margin-right: 8px;
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+        
+        .info-card p {
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .gallery-item {
+            height: 180px;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .containers {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .card {
+            width: 30%;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card img{
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        
+        .card p {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .video-container {
+            margin-top: 30px;
+        }
+
+        .centre {
+            width: fit-content;
+            margin: 0 auto;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .video-responsive {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-left">
+                <img src="flag.png" alt="Drapeau de la Tunisie" height="50px">
+            </div>
+            <div class="nav-right">
+                <a href="projet.html" class="active">Accueil</a>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle">Destination</a>
+                    <div class="dropdown-content">
+                        <a href="nord-details.html">Nord</a>
+                        <a href="centre.html">Centre</a>
+                        <a href="sud.html">Sud</a>
+                    </div>
+                </div>       
+                <a href="contact.html">Contact</a>
+                <div class="search-container">
+                    <input type="text" placeholder="Rechercher..." class="search-bar">
+                    <button class="search-button">🔍</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <button onclick="history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Retour
+    </button>
+
+    <section class="city-hero">
+        <h1>El Jem</h1>
+        <p>L'amphithéâtre romain le plus impressionnant d'Afrique, témoin de la grandeur de Thysdrus</p>
+    </section>
+
+    <div class="container">
+        <section class="section section-target">
+            <div class="section-title">
+                <h2>Top visites à El Jem</h2>
+            </div>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <img src="amphitheatre-eljem.jpg" alt="Amphithéâtre d'El Jem" class="card-img">
+                    <div class="card-content">
+                        <h3>Amphithéâtre Romain</h3>
+                        <p>Classé au patrimoine mondial de l'UNESCO, ce <span class="highlight">colosse de pierre</span> du 3ème siècle est le 3ème plus grand du monde romain après Rome et Capoue. Il pouvait accueillir <span class="highlight">35,000 spectateurs</span>.</p> 
+                    </div>
+                </div>
+                
+                <div class="highlight-card">
+                    <img src="musee-eljem.jpg" alt="Musée archéologique" class="card-img">
+                    <div class="card-content">
+                        <h3>Musée Archéologique</h3>
+                        <p>Abrite une <span class="highlight">riche collection</span> de mosaïques romaines parmi les plus belles de Tunisie, dont la célèbre mosaïque de <span class="highlight">Virgile entouré des Muses</span>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section-target">
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <img src="villa-africaine.jpg" alt="Villa Africa" class="card-img">
+                    <div class="card-content">
+                        <h3>Villa Africa</h3>
+                        <p>Cette <span class="highlight">somptueuse demeure romaine</span> reconstituée dans le musée montre le faste des riches propriétaires de l'antique Thysdrus, <span class="highlight">capitale de l'huile d'olive</span>.</p>
+                    </div>
+                </div>
+                
+                <div class="highlight-card">
+                    <img src="souterrains-eljem.jpg" alt="Souterrains de l'amphithéâtre" class="card-img">
+                    <div class="card-content">
+                        <h3>Souterrains de l'Amphithéâtre</h3>
+                        <p>Explorez les <span class="highlight">galeries souterraines</span> où gladiateurs et fauves attendaient leur tour avant les spectacles, dans une <span class="highlight">atmosphère authentique</span>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        </br>
+
+        <section>
+            <div class="section-title">
+                <h2>Où se loger à El Jem</h2>
+                </br>
+                </br>
+                <P>Bien que petite, El Jem offre quelques options d'hébergement et des possibilités dans les villes voisines.</p>
+            </Div>
+            <div class="containers">
+                <div class="card">
+                    <img src="hotel-eljem.jpg" alt="Hôtel près de l'amphithéâtre">
+                    <h3>Hôtel près du site</h3>
+                    <p>Vue imprenable sur l'amphithéâtre</p>
+                </div>
+                <div class="card">
+                    <img src="maison-guest.jpg" alt="Maisons d'hôtes">
+                    <h3>Maisons d'hôtes</h3>
+                    <p>Charme et authenticité locale</p>
+                </div>
+                <div class="card">
+                    <img src="sousse-hotel.jpg" alt="Hôtels à Sousse">
+                    <h3>Sousse (60km)</h3>
+                    <p>Large choix d'hôtels balnéaires</p>
+                </div>
+            </div>
+            </br>
+            </br>
+        </section>
+
+        <section class="section">
+            <div class="section-title">
+                <h2>Carte des Points d'Intérêt</h2>
+                </br>
+            </div>
+            <div class="map-container">
+                <div id="eljem-map"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">
+                <h2>Informations Pratiques</h2>
+            </div>
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3><i class="fas fa-subway"></i> Transports</h3>
+                    <p><strong>Train :</strong> Liaisons directes avec Sousse et Sfax</p>
+                    <p><strong>Louages :</strong> Depuis Mahdia, Sousse ou Sfax</p>
+                    <p><strong>Voiture :</strong> À 2h de Tunis (200km)</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-utensils"></i> Gastronomie</h3>
+                    <p><strong>Spécialités :</strong> Coussinet aux dattes, brik, poisson</p>
+                    <p><strong>Bonnes adresses :</strong> Restaurant du Musée, Café de l'Amphithéâtre</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Conseils</h3>
+                    <p><strong>Meilleure période :</strong> Octobre à avril</p>
+                    <p><strong>Équipement :</strong> Chaussures confortables, protection solaire</p>
+                    <p><strong>Festival :</strong> Festival international de musique symphonique (été)</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">
+                <h2>Galerie Photos</h2>
+            </div>
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="eljem1.jpg" alt="Vue aérienne de l'amphithéâtre">
+                </div>
+                <div class="gallery-item">
+                    <img src="eljem2.jpg" alt="Arènes vides">
+                </div>
+                <div class="gallery-item">
+                    <img src="eljem3.jpg" alt="Détail architectural">
+                </div>
+                <div class="gallery-item">
+                    <img src="eljem4.jpg" alt="Spectacle dans l'amphithéâtre">
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">
+                <h2>Découvrez El Jem en vidéo</h2>
+            </div>
+            <div class="video-container">
+                <video width="950" height="500" controls>
+                    <source src="eljem-video.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map centered on El Jem
+        const map = L.map('eljem-map').setView([35.2964, 10.7067], 15);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Points of interest for El Jem
+        const points = [
+            {
+                name: "Amphithéâtre d'El Jem",
+                coords: [35.2964, 10.7067],
+                description: "Patrimoine mondial UNESCO, 3ème plus grand du monde romain",
+                icon: "amphi"
+            },
+            {
+                name: "Musée Archéologique",
+                coords: [35.2975, 10.7078],
+                description: "Collection exceptionnelle de mosaïques",
+                icon: "museum"
+            },
+            {
+                name: "Villa Africa",
+                coords: [35.2978, 10.7081],
+                description: "Demeure romaine reconstituée",
+                icon: "villa"
+            },
+            {
+                name: "Gare d'El Jem",
+                coords: [35.3006, 10.7119],
+                description: "Liaisons avec Sousse et Sfax",
+                icon: "train"
+            },
+            {
+                name: "Centre ville",
+                coords: [35.2983, 10.7100],
+                description: "Marché et restaurants locaux",
+                icon: "city"
+            },
+            {
+                name: "Site archéologique",
+                coords: [35.2950, 10.7050],
+                description: "Vestiges de l'antique Thysdrus",
+                icon: "ruins"
+            }
+        ];
+
+        // Custom icons for El Jem
+        const iconUrls = {
+            amphi: "https://cdn-icons-png.flaticon.com/512/2534/2534338.png",
+            museum: "https://cdn-icons-png.flaticon.com/512/2077/2077926.png",
+            villa: "https://cdn-icons-png.flaticon.com/512/2077/2077926.png",
+            train: "https://cdn-icons-png.flaticon.com/512/2534/2534338.png",
+            city: "https://cdn-icons-png.flaticon.com/512/2077/2077926.png",
+            ruins: "https://cdn-icons-png.flaticon.com/512/2534/2534338.png"
+        };
+
+        // Add markers to the map
+        points.forEach(point => {
+            const customIcon = L.icon({
+                iconUrl: iconUrls[point.icon],
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+            
+            L.marker(point.coords, {icon: customIcon})
+                .addTo(map)
+                .bindPopup(`<b>${point.name}</b><br>${point.description}`);
+        });
+    </script>
+</body>
+</html>

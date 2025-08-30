@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarzis - Perle de la Méditerranée</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <style>
+        :root {
+            --primary: #2980b9;
+            --secondary: #e62222;
+            --light: #f9f9f9;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        /* Header transparent */
+        header {
+            background: var(--primary);
+            padding: 15px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-left img {
+            height: 50px;
+            width: auto;
+            border-radius: 0.2cm;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+        }
+        
+        nav a:hover {
+            color: #e62222;
+            transition: color 0.3s ease-in-out;
+        }
+        
+        /* Conteneur principal du dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Bouton du menu déroulant */
+        .dropdown-toggle {
+            background: none;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .dropdown-toggle:hover {
+            color: #e62222;
+        }
+
+        /* Contenu du menu déroulant */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            background: rgba(255, 255, 255, 0.2); /* Transparence */
+            backdrop-filter: blur(5px); /* Effet flou pour lisibilité */
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        /* Options du menu déroulant */
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: #e62222;
+            color: white;
+        }
+
+        /* Afficher le menu au survol */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar {
+            padding: 8px 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus {
+            width: 250px;
+            box-shadow: 0 0 10px rgba(230, 34, 34, 0.6);
+        }
+        
+        .search-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: -35px;
+        }
+        
+        /* Bouton Retour */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-3px);
+        }
+        
+        .back-btn i {
+            margin-right: 5px;
+        }
+        
+        /* Hero Section */
+        .city-hero {
+            height: 50vh;
+            min-height: 400px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)), url('zarzis-hero.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+        
+        .city-hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.8rem;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .city-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+        }
+        
+        .section-title h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: inline-block;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 5px;
+        }
+        
+        /* Cards Grid */
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .highlight-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .highlight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .card-content h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        
+        .card-content p {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+        }
+        
+        /* Map Section */
+        .map-container {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        #zarzis-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Practical Info */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-card h3 i {
+            margin-right: 8px;
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+        
+        .info-card p {
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        /* Gallery */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .gallery-item {
+            height: 180px;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .containers {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .card {
+            width: 30%;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card img{
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        
+        .card p {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .video-container {
+            margin-top: 30px;
+        }
+
+        .centre {
+            width: fit-content;
+            margin: 0 auto;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .video-responsive {
+            width: 100%;    /* prend toute la largeur du conteneur */
+            height: auto;   /* garde les proportions originales */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header transparent -->
+    <header>
+        <nav>
+            <div class="nav-left">
+                <img src="flag.png" alt="Drapeau de la Tunisie" height="50px">
+            </div>
+            <div class="nav-right">
+                <a href="projet.html" class="active">Accueil</a>
+                <!-- Dropdown menu -->
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle">Destination</a>
+                    <div class="dropdown-content">
+                        <a href="nord-details.html">Nord</a>
+                        <a href="centre.html">Centre</a>
+                        <a href="sud.html">Sud</a>
+                    </div>
+                </div>       
+                <a href="contact.html">Contact</a>
+                <div class="search-container">
+                    <input type="text" placeholder="Rechercher..." class="search-bar">
+                    <button class="search-button">🔍</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Bouton Retour -->
+    <button onclick="history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Retour
+    </button>
+
+    <!-- Hero Section -->
+    <section class="city-hero">
+        <h1>Zarzis</h1>
+        <p>Entre plages de sable fin et oasis préservées, la douceur de vivre méditerranéenne</p>
+    </section>
+
+    <div class="container">
+        <section class="section section-target">
+            <div class="section-title">
+                <h2>Top visites à Zarzis</h2>
+            </div>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <img src="plage-zarzis.jpg" alt="Plages de Zarzis" class="card-img">
+                    <div class="card-content">
+                        <h3>Plages de sable fin</h3>
+                        <p>Découvrez les <span class="highlight">plages immaculées</span> de Zarzis, dont la célèbre plage de Sidi Mahrez, avec ses <span class="highlight">eaux turquoises</span> et son sable doré. Idéal pour la baignade et les sports nautiques.</p> 
+                    </div>
+                </div>
+                
+                <div class="highlight-card">
+                    <img src="ile-jerba.jpg" alt="Route vers Djerba" class="card-img">
+                    <div class="card-content">
+                        <h3>Excursion à Djerba</h3>
+                        <p>À seulement 30 minutes, l'île de Djerba offre ses <span class="highlight">villages traditionnels</span>, son souk animé et la synagogue de la Ghriba, un <span class="highlight">site historique unique</span>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section-target">
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <img src="marina-zarzis.jpg" alt="Marina de Zarzis" class="card-img">
+                    <div class="card-content">
+                        <h3>Marina de Zarzis</h3>
+                        <p>Ce <span class="highlight">port de plaisance moderne</span> est le point de départ pour des croisières et propose de nombreux <span class="highlight">restaurants et cafés</span> avec vue sur les yachts.</p>
+                    </div>
+                </div>
+                
+                <div class="highlight-card">
+                    <img src="phare-zarzis.jpg" alt="Phare de Zarzis" class="card-img">
+                    <div class="card-content">
+                        <h3>Phare de Zarzis</h3>
+                        <p>Symbole de la ville, ce phare offre un <span class="highlight">panorama exceptionnel</span> sur la Méditerranée. Le coucher de soleil y est <span class="highlight">spectaculaire</span>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        </br>
+
+        <section>
+            <div class="section-title">
+                <h2>Où se loger à Zarzis</h2>
+                </br>
+                </br>
+                <P>Zarzis propose des hébergements pour tous les budgets, des complexes hôteliers luxueux aux maisons d'hôtes authentiques.</p>
+            </Div>
+            <div class="containers">
+                <div class="card">
+                    <img src="hotel-zarzis.jpg" alt="Hôtels à Zarzis">
+                    <h3>Hôtels balnéaires</h3>
+                    <p>Résidences de luxe avec spa et accès direct aux plages</p>
+                </div>
+                <div class="card">
+                    <img src="riad-zarzis.jpg" alt="Maisons d'hôtes">
+                    <h3>Maisons d'hôtes</h3>
+                    <p>Charme et authenticité dans des demeures traditionnelles</p>
+                </div>
+                <div class="card">
+                    <img src="appart-zarzis.jpg" alt="Appartements">
+                    <h3>Appartements</h3>
+                    <p>Locations saisonnières avec vue sur mer</p>
+                </div>
+            </div>
+            </br>
+            </br>
+        </section>
+
+        <!-- Map Section -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Carte des Points d'Intérêt</h2>
+                </br>
+            </div>
+            <div class="map-container">
+                <div id="zarzis-map"></div>
+            </div>
+        </section>
+
+        <!-- Practical Info -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Informations Pratiques</h2>
+            </div>
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3><i class="fas fa-subway"></i> Transports</h3>
+                    <p><strong>Aéroport :</strong> Aéroport international de Djerba-Zarzis (30 min)</p>
+                    <p><strong>Déplacements :</strong> Taxis abordables et location de voitures</p>
+                    <p><strong>Navettes :</strong> Vers Djerba et les sites touristiques</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-utensils"></i> Gastronomie</h3>
+                    <p><strong>Spécialités :</strong> Poisson frais, couscous au poisson, fruits de mer</p>
+                    <p><strong>Bonnes adresses :</strong> Restaurant Le Phare, La Coupole</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Conseils</h3>
+                    <p><strong>Meilleure période :</strong> Avril à novembre (climat doux)</p>
+                    <p><strong>Équipement :</strong> Protection solaire, maillot de bain</p>
+                    <p><strong>Activités :</strong> Thalasso, golf, plongée sous-marine</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Galerie Photos</h2>
+            </div>
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="zarzis1.jpg" alt="Plage de Zarzis">
+                </div>
+                <div class="gallery-item">
+                    <img src="zarzis2.jpg" alt="Coucher de soleil">
+                </div>
+                <div class="gallery-item">
+                    <img src="zarzis3.jpg" alt="Port de pêche">
+                </div>
+                <div class="gallery-item">
+                    <img src="zarzis4.jpg" alt="Oasis">
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">
+                <h2>Découvrez Zarzis en vidéo</h2>
+            </div>
+            <div class="video-container">
+                <video width="950" height="500" controls>
+                    <source src="zarziz-video.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+            </div>
+        </section>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map centered on Zarzis
+        const map = L.map('zarzis-map').setView([33.5039, 11.1122], 12);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Points of interest for Zarzis
+        const points = [
+            {
+                name: "Plage de Sidi Mahrez",
+                coords: [33.5500, 11.1000],
+                description: "Plus belle plage de Zarzis",
+                icon: "beach"
+            },
+            {
+                name: "Marina de Zarzis",
+                coords: [33.5100, 11.1167],
+                description: "Port de plaisance et restaurants",
+                icon: "harbor"
+            },
+            {
+                name: "Phare de Zarzis",
+                coords: [33.5083, 11.1167],
+                description: "Point de vue panoramique",
+                icon: "lighthouse"
+            },
+            {
+                name: "Centre-ville",
+                coords: [33.5039, 11.1122],
+                description: "Souk et vie locale",
+                icon: "city"
+            },
+            {
+                name: "Oasis de Zarzis",
+                coords: [33.4667, 11.0833],
+                description: "Palmeraie préservée",
+                icon: "oasis"
+            },
+            {
+                name: "Route de Djerba",
+                coords: [33.5167, 11.0500],
+                description: "Accès à l'île de Djerba",
+                icon: "island"
+            }
+        ];
+
+        // Custom icons for Zarzis
+        const iconUrls = {
+            beach: "https://cdn-icons-png.flaticon.com/512/3464/3464118.png",
+            harbor: "https://cdn-icons-png.flaticon.com/512/3130/3130313.png",
+            lighthouse: "https://cdn-icons-png.flaticon.com/512/3225/3225443.png",
+            city: "https://cdn-icons-png.flaticon.com/512/484/484167.png",
+            oasis: "https://cdn-icons-png.flaticon.com/512/3223/3223367.png",
+            island: "https://cdn-icons-png.flaticon.com/512/3213/3213116.png"
+        };
+
+        // Add markers to the map
+        points.forEach(point => {
+            const customIcon = L.icon({
+                iconUrl: iconUrls[point.icon],
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+            
+            L.marker(point.coords, {icon: customIcon})
+                .addTo(map)
+                .bindPopup(`<b>${point.name}</b><br>${point.description}`);
+        });
+    </script>
+</body>
+</html>

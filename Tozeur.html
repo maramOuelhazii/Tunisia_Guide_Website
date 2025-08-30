@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tozeur</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <style>
+        :root {
+            --primary: #2980b9;
+            --secondary: #e62222;
+            --light: #f9f9f9;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+         /* Header transparent */
+         header {
+            background: var(--primary);
+            padding: 15px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-left img {
+            height: 50px;
+            width: auto;
+            border-radius: 0.2cm;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+        }
+        
+        nav a:hover {
+            color: #e62222;
+            transition: color 0.3s ease-in-out;
+        }
+        
+        /* Conteneur principal du dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Bouton du menu déroulant */
+        .dropdown-toggle {
+            background: none;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .dropdown-toggle:hover {
+            color: #e62222;
+        }
+
+        /* Contenu du menu déroulant */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            background: rgba(255, 255, 255, 0.2); /* Transparence */
+            backdrop-filter: blur(5px); /* Effet flou pour lisibilité */
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        /* Options du menu déroulant */
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: #e62222;
+            color: white;
+        }
+
+        /* Afficher le menu au survol */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar {
+            padding: 8px 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus {
+            width: 250px;
+            box-shadow: 0 0 10px rgba(230, 34, 34, 0.6);
+        }
+        
+        .search-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: -35px;
+        }
+
+        
+        /* Bouton Retour */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-3px);
+        }
+        
+        .back-btn i {
+            margin-right: 5px;
+        }
+        
+        /* Hero Section */
+        .city-hero {
+            height: 50vh;
+            min-height: 400px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)), url('t2.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+        
+        .city-hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.8rem;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .city-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+        }
+        
+        .section-title h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: inline-block;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 5px;
+        }
+        
+        /* Cards Grid */
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .highlight-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .highlight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .card-content h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        
+        .card-content p {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+        }
+        
+        /* Map Section */
+        .map-container {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        #Tozeur-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Practical Info */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-card h3 i {
+            margin-right: 8px;
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+        
+        .info-card p {
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        /* Gallery */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .gallery-item {
+            height: 180px;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .containers {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .card {
+            width: 30%;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card img{
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        
+        .card p {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .video-container {
+            margin-top: 30px;
+        }
+
+        .centre {
+            width: fit-content;
+            margin: 0 auto;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .video-responsive {
+            width: 100%;    /* prend toute la largeur du conteneur */
+            height: auto;   /* garde les proportions originales */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header transparent -->
+    <header>
+        <nav>
+            <div class="nav-left">
+                <img src="flag.png" alt="Drapeau de la Tunisie" height="50px">
+            </div>
+            <div class="nav-right">
+                <a href="projet.html" class="active">Accueil</a>
+                <!-- Dropdown menu -->
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle">Destination</a>
+                    <div class="dropdown-content">
+                        <a href="nord-details.html">Nord</a>
+                        <a href="centre.html">Centre</a>
+                        <a href="sud.html">Sud</a>
+                    </div>
+                </div>       
+                <a href="contact.html">Contact</a>
+                <div class="search-container">
+                    <input type="text" placeholder="Rechercher..." class="search-bar">
+                    <button class="search-button">🔍</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Bouton Retour -->
+    <button onclick="history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Retour
+    </button>
+
+    <!-- Hero Section -->
+    <section class="city-hero">
+        <h1>Tozeur</h1>
+        <p>Où l'histoire millénaire rencontre la modernité méditerranéenne</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <section class="section section-target">
+            <div class="section-title">
+                <h2>Top visites à Tozeur</h2>
+            </div>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <img src="soukt.jpg" alt="Site Archéologique de Bulla Regias de Tozeur"" class="card-img">
+                    <div class="card-content">
+                        <h3>Le Souk de Tozeur (Médina)</h3>
+                        <p>Le souk de Tozeur est situé dans <span class="highlight">la vieille médina</span>, un labyrinthe de ruelles bordées de murs en briques ocre caractéristiques de l’architecture locale. On y trouve <span class="highlight">des articles traditionnels</span> comme des poteries, des tapis berbères, des dattes (Tozeur est célèbre pour ses dattes Deglet Nour), des bijoux, et des objets en cuir ou cuivre. C’est un lieu animé et coloré, très prisé des touristes pour faire des emplettes authentiques.</p>
+                    </div>
+                </div>
+                <div class="highlight-card">
+                    <img src="parct.jpg" alt="Parc National de Feidja" class="card-img">
+                    <div class="card-content">
+                        <h3>La Mosquée Farka</h3>
+                        <p>La mosquée la plus connue est celle de Farka ou <span class="highlight">la grande mosquée de Tozeur</span>, reconnaissable à son minaret en brique décorée, typique de l’architecture saharienne. Ce lieu sacré, encore actif, représente<span class="highlight"> un héritage religieux et historique </span> important de la région.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section-target">
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <img src="chemtout.jpg" alt="Musée archéologique de Chemtou" class="card-img">
+                    <div class="card-content">
+                        <h3>Le Musée Dar Cheraït</h3>
+                        <p>Le musée Dar Cheraït, est <span class="highlight">l’un des premiers musées privés de Tunisie</span>. Il est installé dans une belle maison traditionnelle. Il présente des costumes traditionnels, des objets artisanaux, des reconstitutions de scènes de la vie quotidienne tunisienne et des collections inspirées de l’époque andalouse et ottomane. C’est un arrêt incontournable pour découvrir la richesse du patrimoine du <span class="highlight"> Sud tunisien</span>.</p>
+                    </div>
+                </div>
+                </br>
+        </section>
+
+        <section>
+            <div class="section-title">
+                <h2>Où se loger à Tozeur</h2>
+                </br>
+                </br>
+                <P>A Tozeur le choix d’hébergements et si vaste qu’il puisse répondre à tout les besoins et tous les gouts ! Hôtels, maisons d’hôtes et locations de vacances.</p>
+            </div>
+            <div class="containers">
+                <div class="card">
+                    <img src="hotelt.jpg" alt="Hôtel à Tozeur">
+                    <h3>  Hôtels à Tozeur</h3>
+                    <p>Réservez vos hôtels aux meilleurs tarifs avec Booking.com !</p>
+                </div>
+                <div class="card">
+                    <img src="maisont.jpg" alt="Maison d'hôtes">
+                    <h3>  Maisons d’hôtes</h3>
+                    <p>Réservez les meilleures maisons d’hôtes à Tozeur aux meilleurs tarifs !</p>
+                </div>
+                <div class="card">
+                    <img src="locationt.jpg" alt="Location de vacances">
+                    <h3>  Location de vacances</h3>
+                    <p>Réservez un appartement, une villa avec piscine et toute location de vacances avec AirBnb.</p>
+                </div>
+            </div>
+            </br>
+            </br>
+        </section>
+
+        <!-- Map Section -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Carte des Points d'Intérêt</h2>
+                </br>
+            </div>
+            <div class="map-container">
+                <div id="Tozeur-map"></div>
+            </div>
+        </section>
+
+        <!-- Practical Info -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Informations Pratiques</h2>
+            </div>
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3><i class="fas fa-subway"></i> Transports</h3>
+                    <p><strong>Taxi :</strong> Très présents en ville. Trajets en centre-ville entre 2 TND et 5 TND.</p>
+                    <p><strong>Louer une voiture : </strong>  Idéal pour explorer les environs comme Nefta, Ong Jemel ou le Chott El Jerid. Plusieurs agences disponibles au centre-ville et à l'aéroport.</p>
+                    <p><strong>Calèche et vélo :</strong> Moyens originaux pour se déplacer dans la médina ou autour des palmeraies.</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-utensils"></i> Gastronomie</h3>
+                    <p><strong>Spécialités :</strong> Dattes Deglet Nour ,Brik aux œufs, Chorba et tajine à l’agneau</p>
+                    <p><strong>Bonnes adresses :</strong> Dar Tozeur, Restaurant Palmier d'Or et Restaurant Le Soleil .</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Conseils</h3>
+                    <p><strong>Monnaie :</strong> Le Dinar Tunisien (TND). 1 € ≈ 3.2 TND (vérifiez le taux actualisé).</p>
+                    <p><strong>Langue :</strong> Arabe (français très répandu)</p>
+                    <p><strong>Sécurité :</strong> Ville calme et accueillante. Il est conseillé d’éviter les lieux désertés la nuit comme partout ailleurs.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Galerie Photos</h2>
+            </div>
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="Tozeur1.jpg" alt="Tozeur">
+                </div>
+                <div class="gallery-item">
+                    <img src="Tozeur2.jpg" alt="Tozeur">
+                </div>
+                <div class="gallery-item">
+                    <img src="Tozeur3.jpg" alt="Tozeur">
+                </div>
+                <div class="gallery-item">
+                    <img src="Tozeur4.jpg" alt="Tozeur">
+                </div>
+            </div>
+        </section>
+        
+        <section>
+            <div class="section-title">
+                <h2>Découvrez Tozeur en vidéo</h2>
+            </div>
+            <div class="video-container">
+                <video width="950" height="500" controls>
+                    <source src="Visite_Tozeur.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+            </div>
+        </section>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map centered on Tozeur
+        const map = L.map('Tozeur-map').setView([33.9197, 8.1335], 13);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Add markers for Tozeur points of interest
+        const points = [
+            {
+                name: "Médina de Tozeur",
+                coords: [33.9192, 8.1305],
+                description: "Vieille ville avec architecture en briques caractéristique",
+                icon: "medina"
+            },
+            {
+                name: "Musée Dar Cheraït",
+                coords: [33.9186, 8.1279],
+                description: "Musée privé présentant la culture et traditions locales",
+                icon: "museum"
+            },
+            {
+                name: "Mosquée Farka",
+                coords: [33.9215, 8.1328],
+                description: "Mosquée principale avec minaret en briques décorées",
+                icon: "mosque"
+            },
+            {
+                name: "Palmeraie de Tozeur",
+                coords: [33.9150, 8.1400],
+                description: "Vaste oasis avec milliers de palmiers dattiers",
+                icon: "palm"
+            },
+            {
+                name: "Parc du Paradis",
+                coords: [33.9173, 8.1247],
+                description: "Jardin botanique présentant la flore saharienne",
+                icon: "park"
+            },
+            {
+                name: "Zoo du désert",
+                coords: [33.9238, 8.1362],
+                description: "Parc animalier spécialisé dans la faune saharienne",
+                icon: "zoo"
+            },
+            {
+                name: "Gare routière",
+                coords: [33.9225, 8.1283],
+                description: "Départ des bus et louages pour toute la région",
+                icon: "bus"
+            }
+        ];
+        
+        // Custom icons
+        const iconUrls = {
+            medina: "https://cdn-icons-png.flaticon.com/512/619/619153.png",
+            museum: "https://cdn-icons-png.flaticon.com/512/2077/2077926.png",
+            mosque: "https://cdn-icons-png.flaticon.com/512/3130/3130313.png",
+            palm: "https://cdn-icons-png.flaticon.com/512/3039/3039013.png",
+            park: "https://cdn-icons-png.flaticon.com/512/3082/3082383.png",
+            zoo: "https://cdn-icons-png.flaticon.com/512/616/616408.png",
+            bus: "https://cdn-icons-png.flaticon.com/512/2838/2838694.png"
+        };
+        
+        // Add markers to the map
+        points.forEach(point => {
+            const customIcon = L.icon({
+                iconUrl: iconUrls[point.icon],
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+            
+            L.marker(point.coords, {icon: customIcon})
+                .addTo(map)
+                .bindPopup(`<b>${point.name}</b><br>${point.description}`);
+        });
+    </script>
+</body>
+</html>

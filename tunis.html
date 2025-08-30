@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tunis</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <style>
+        :root {
+            --primary: #2980b9;
+            --secondary: #e62222;
+            --light: #f9f9f9;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+         /* Header transparent */
+         header {
+            background: var(--primary);
+            padding: 15px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-left img {
+            height: 50px;
+            width: auto;
+            border-radius: 0.2cm;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+        }
+        
+        nav a:hover {
+            color: #e62222;
+            transition: color 0.3s ease-in-out;
+        }
+        
+        /* Conteneur principal du dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Bouton du menu déroulant */
+        .dropdown-toggle {
+            background: none;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .dropdown-toggle:hover {
+            color: #e62222;
+        }
+
+        /* Contenu du menu déroulant */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            background: rgba(255, 255, 255, 0.2); /* Transparence */
+            backdrop-filter: blur(5px); /* Effet flou pour lisibilité */
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        /* Options du menu déroulant */
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: #e62222;
+            color: white;
+        }
+
+        /* Afficher le menu au survol */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar {
+            padding: 8px 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus {
+            width: 250px;
+            box-shadow: 0 0 10px rgba(230, 34, 34, 0.6);
+        }
+        
+        .search-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: -35px;
+        }
+
+        /* Bouton Retour */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-3px);
+        }
+        
+        .back-btn i {
+            margin-right: 5px;
+        }
+        
+        /* Hero Section */
+        .city-hero {
+            height: 50vh;
+            min-height: 400px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)), url('tunis-hero.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+        
+        .city-hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.8rem;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .city-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+        }
+        
+        .section-title h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: inline-block;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 5px;
+        }
+        
+        /* Cards Grid */
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .highlight-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .highlight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .card-content h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        
+        .card-content p {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+        }
+        
+        /* Map Section */
+        .map-container {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        #tunis-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Practical Info */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-card h3 i {
+            margin-right: 8px;
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+        
+        .info-card p {
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        /* Gallery */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .gallery-item {
+            height: 180px;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .containers {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .card {
+            width: 30%;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card img{
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        
+        .card p {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .video-container {
+            margin-top: 30px;
+        }
+
+        .centre {
+            width: fit-content;
+            margin: 0 auto;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .video-responsive {
+            width: 100%;    /* prend toute la largeur du conteneur */
+            height: auto;   /* garde les proportions originales */
+        }
+    </style>
+</head>
+<body>
+<!-- Header transparent -->
+    <header>
+        <nav>
+            <div class="nav-left">
+                <img src="flag.png" alt="Drapeau de la Tunisie" height="50px">
+            </div>
+            <div class="nav-right">
+                <a href="projet.html" class="active">Accueil</a>
+                <!-- Dropdown menu -->
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle">Destination</a>
+                    <div class="dropdown-content">
+                        <a href="nord-details.html">Nord</a>
+                        <a href="centre.html">Centre</a>
+                        <a href="sud.html">Sud</a>
+                    </div>
+                </div>       
+                <a href="contact.html">Contact</a>
+                <div class="search-container">
+                    <input type="text" placeholder="Rechercher..." class="search-bar">
+                    <button class="search-button">🔍</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Bouton Retour -->
+    <button onclick="history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Retour
+    </button>
+
+    <!-- Hero Section -->
+    <section class="city-hero">
+        <h1>Tunis</h1>
+        <p>Où l'histoire millénaire rencontre la modernité méditerranéenne</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Médina Section -->
+        <section id="medina" class="section section-target">
+            <div class="section-title">
+                <h2>La Médina de Tunis</h2>
+            </div>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <img src="souk.jpg" alt="Souks de Tunis" class="card-img">
+                    <div class="card-content">
+                        <h3>Les Souks Légendaires</h3>
+                        <p>Plongez dans l'atmosphère envoûtante des souks de la médina, classée au patrimoine mondial de l'UNESCO. Découvrez le <span class="highlight">souk El Attarine</span> (parfums), le <span class="highlight">souk des Chechias</span> (chapeaux traditionnels) et le <span class="highlight">souk des Orfèvres</span>, où l'artisanat tunisien prend vie.</p>
+                        <a href="#medina-info" class="btn">Visite Guidée</a>
+                    </div>
+                </div>
+                
+                <div class="highlight-card">
+                    <img src="zitouna.jpg" alt="Mosquée Zitouna" class="card-img">
+                    <div class="card-content">
+                        <h3>Mosquée Zitouna</h3>
+                        <p>Fondée en 698, la <span class="highlight">"Mosquée de l'Olivier"</span> est un joyau architectural avec sa salle de prière aux 160 colonnes antiques. Son minaret de 44 mètres domine le paysage de la médina.</p>
+                        <a href="#zitouna-info" class="btn">Horaires de Visite</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modern Tunis Section -->
+        <section id="modern-tunis" class="section section-target">
+            <div class="section-title">
+                <h2>Tunis Moderne</h2>
+            </div>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <img src="bourguiba.jpg" alt="Avenue Bourguiba" class="card-img">
+                    <div class="card-content">
+                        <h3>Avenue Habib Bourguiba</h3>
+                        <p>Artère principale inspirée des Champs-Élysées, bordée de ficus centenaires et de bâtiments coloniaux. Ne manquez pas le <span class="highlight">Théâtre Municipal</span>, la <span class="highlight">Cathédrale Saint-Vincent-de-Paul</span> et les cafés historiques.</p>
+                        <a href="#bourguiba-info" class="btn">En savoir plus</a>
+                    </div>
+                </div>
+                
+                <div class="highlight-card">
+                    <img src="bardo.jpg" alt="Musée du Bardo" class="card-img">
+                    <div class="card-content">
+                        <h3>Musée National du Bardo</h3>
+                        <p>Installé dans un ancien palais beylical, ce musée abrite la plus riche collection de <span class="highlight">mosaïques romaines</span> au monde, dont la célèbre mosaïque de Virgile (IIe siècle).</p>
+                        <a href="http://www.bardomuseum.tn/" target="_blank" class="btn">Voir les Expositions</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        </br>
+        <section>
+            <div class="section-title">
+                <h2>Où se loger à Tunis</h2>
+                </br>
+                </br>
+                <P>A Tunis le choix d’hébergements et si vaste qu’il puisse répondre à tout les besoins et tous les gouts ! Hôtels, maisons d’hôtes et locations de vacances.</p>
+             </div>
+             <div class="containers">
+                 <div class="card">
+                     <img src="hotel.jpg" alt="Hôtel à Tunis">
+                     <h3>Hôtels à Tunis</h3>
+                     <p>Réservez vos hôtels aux meilleurs tarifs avec Booking.com !</p>
+                 </div>
+                 <div class="card">
+                    <img src="maison.jpg" alt="Maison d'hôtes">
+                    <h3>Maisons d’hôtes</h3>
+                    <p>Réservez les meilleures maisons d’hôtes à Tunis aux meilleurs tarifs !</p>
+                 </div>
+                 <div class="card">
+                    <img src="location.jpg" alt="Location de vacances">
+                    <h3>Location de vacances</h3>
+                     <p>Réservez un appartement, une villa avec piscine et toute location de vacances avec AirBnb.</p>
+                </div>
+            </div>
+            </br>
+            </br>
+        </section>
+
+        <!-- Map Section -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Carte des Points d'Intérêt</h2>
+                </br>
+            </div>
+            <div class="map-container">
+                <div id="tunis-map"></div>
+            </div>
+        </section>
+
+        <!-- Informations détaillées -->
+        <section id="medina-info" class="section section-target">
+            <div class="section-title">
+                <h2>Informations sur la Médina</h2>
+            </div>
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3><i class="fas fa-clock"></i> Horaires de visite</h3>
+                    <p><strong>Souks :</strong> Ouverts tous les jours de 9h à 19h (fermeture plus tôt le vendredi)</p>
+                    <p><strong>Visites guidées :</strong> Départs à 10h et 15h du Dar Ben Abdallah</p>
+                    <p><strong>Conseil :</strong> Visitez tôt le matin pour éviter la foule</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-euro-sign"></i> Tarifs</h3>
+                    <p><strong>Visite libre :</strong> Gratuit</p>
+                    <p><strong>Guide officiel :</strong> À partir de 50 TND pour 2 heures</p>
+                    <p><strong>Ateliers artisanaux :</strong> Démonstrations gratuites, produits à vendre</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="zitouna-info" class="section section-target">
+            <div class="section-title">
+                <h2>Informations Mosquée Zitouna</h2>
+            </div>
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3><i class="fas fa-clock"></i> Horaires</h3>
+                    <p><strong>Visiteurs non-musulmans :</strong> 8h-14h sauf vendredi</p>
+                    <p><strong>Prière :</strong> 5 fois par jour selon horaires des prières</p>
+                    <p><strong>Visite :</strong> Respectez les heures de prière</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Conseils</h3>
+                    <p><strong>Tenue vestimentaire :</strong> Couvrez épaules et jambes</p>
+                    <p><strong>Photos :</strong> Autorisées sauf pendant les prières</p>
+                    <p><strong>Entrée :</strong> Gratuite mais dons appréciés</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="bourguiba-info" class="section section-target">
+            <div class="section-title">
+                <h2>Informations Avenue Bourguiba</h2>
+            </div>
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3><i class="fas fa-map-marked-alt"></i> À voir</h3>
+                    <p><strong>Théâtre Municipal :</strong> Visites guidées à 11h et 16h</p>
+                    <p><strong>Cathédrale :</strong> Ouverte de 9h à 17h</p>
+                    <p><strong>Cafés historiques :</strong> Café de Paris, Café M'rabet</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-utensils"></i> Où manger</h3>
+                    <p><strong>Le Grand Café Vert :</strong> Pâtisseries traditionnelles</p>
+                    <p><strong>Restaurant Le Baroque :</strong> Cuisine tuniso-française</p>
+                    <p><strong>Street food :</strong> Briks et sandwiches le long de l'avenue</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practical Info -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Informations Pratiques</h2>
+            </div>
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3><i class="fas fa-subway"></i> Transports</h3>
+                    <p><strong>Métro léger :</strong> Réseau efficace (0.5 TND le ticket)</p>
+                    <p><strong>Taxis :</strong> Comptez 3-5 TND pour une course en ville</p>
+                    <p><strong>Location de voiture :</strong> Nombreuses agences disponibles</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-utensils"></i> Gastronomie</h3>
+                    <p><strong>Spécialités :</strong> Couscous, brik à l'œuf, tajine tunisien</p>
+                    <p><strong>Bonnes adresses :</strong> Dar El Jeld (traditionnel), Le Golfe (vue mer)</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Conseils</h3>
+                    <p><strong>Monnaie :</strong> Dinar tunisien (1€ ≈ 3.2 TND)</p>
+                    <p><strong>Langue :</strong> Arabe (français très répandu)</p>
+                    <p><strong>Sécurité :</strong> Ville sûre, éviter de montrer des signes ostentatoires de richesse</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery -->
+        <section class="section">
+            <div class="section-title">
+                <h2>Galerie Photos</h2>
+            </div>
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="tunis-hero.jpg" alt="Médina">
+                </div>
+                <div class="gallery-item">
+                    <img src="tunis.jpg" alt="tunis medina">
+                </div>
+                <div class="gallery-item">
+                    <img src="bardo2.jpg" alt="Musée du Bardo">
+                </div>
+                <div class="gallery-item">
+                    <img src="zitouna2.jpg" alt="Mosquée Zitouna">
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">
+                <h2>Découvrez Tunis en vidéo</h2>
+            </div>
+            <div class="video-container">
+                <video width="950" height="500" controls>
+                    <source src="Visité Tunis.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+            </div>
+        </section>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        const map = L.map('tunis-map').setView([36.8008, 10.1800], 13);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Add markers
+        const points = [
+            {
+                name: "Médina de Tunis",
+                coords: [36.7979, 10.1716],
+                description: "Cœur historique classé UNESCO",
+                icon: "medina"
+            },
+            {
+                name: "Avenue Bourguiba",
+                coords: [36.8007, 10.1828],
+                description: "Artère principale de la ville moderne",
+                icon: "avenue"
+            },
+            {
+                name: "Musée du Bardo",
+                coords: [36.8093, 10.1337],
+                description: "Plus riche collection de mosaïques romaines",
+                icon: "museum"
+            },
+            {
+                name: "Mosquée Zitouna",
+                coords: [36.7969, 10.1718],
+                description: "Plus ancienne mosquée de la capitale",
+                icon: "mosque"
+            },
+            {
+                name: "Cathédrale Saint-Vincent-de-Paul",
+                coords: [36.8002, 10.1815],
+                description: "Cathédrale de style néo-roman",
+                icon: "church"
+            },
+            {
+                name: "Théâtre Municipal",
+                coords: [36.8005, 10.1832],
+                description: "Théâtre de style Art Nouveau",
+                icon: "theater"
+            }
+        ];
+        
+        // Custom icons
+        const iconUrls = {
+            medina: "https://cdn-icons-png.flaticon.com/512/619/619153.png",
+            avenue: "https://cdn-icons-png.flaticon.com/512/484/484167.png",
+            museum: "https://cdn-icons-png.flaticon.com/512/2077/2077926.png",
+            mosque: "https://cdn-icons-png.flaticon.com/512/3130/3130313.png",
+            church: "https://cdn-icons-png.flaticon.com/512/619/619034.png",
+            theater: "https://cdn-icons-png.flaticon.com/512/2077/2077928.png"
+        };
+        
+        // Add markers to the map
+        points.forEach(point => {
+            const customIcon = L.icon({
+                iconUrl: iconUrls[point.icon],
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+            
+            L.marker(point.coords, {icon: customIcon})
+                .addTo(map)
+                .bindPopup(`<b>${point.name}</b><br>${point.description}`);
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                if(this.getAttribute('target') !== '_blank') {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centre de la Tunisie</title>
+    <style>
+        /* Styles cohérents avec votre site */
+        :root {
+            --primary: #2980b9;
+            --secondary: #e62222;
+            --light: #f9f9f9;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+        
+         /* Header transparent */
+         header {
+            background: var(--primary);
+            padding: 15px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-left img {
+            height: 50px;
+            width: auto;
+            border-radius: 0.2cm;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+        }
+        
+        nav a:hover {
+            color: #e62222;
+            transition: color 0.3s ease-in-out;
+        }
+        
+        /* Conteneur principal du dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Bouton du menu déroulant */
+        .dropdown-toggle {
+            background: none;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .dropdown-toggle:hover {
+            color: #e62222;
+        }
+
+        /* Contenu du menu déroulant */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            background: rgba(255, 255, 255, 0.2); /* Transparence */
+            backdrop-filter: blur(5px); /* Effet flou pour lisibilité */
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        /* Options du menu déroulant */
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: #e62222;
+            color: white;
+        }
+
+        /* Afficher le menu au survol */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar {
+            padding: 8px 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus {
+            width: 250px;
+            box-shadow: 0 0 10px rgba(230, 34, 34, 0.6);
+        }
+        
+        .search-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: -35px;
+        }
+
+        /* Hero Section */
+        .region-hero {
+            height: 50vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('centre.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+        
+        .region-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .region-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .intro-text {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+        
+        .intro-text p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Cards Grid - Style amélioré */
+        .regions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .region-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .region-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .region-img {
+            height: 250px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .region-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .region-title {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .region-desc {
+            color: #555;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .btn-container {
+            text-align: right;
+        }
+        
+        .see-more-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .see-more-btn:hover {
+            background: var(--secondary);
+        }
+        
+        /* Section Map */
+        .map-section {
+            margin: 60px 0;
+            text-align: center;
+        }
+        
+        .map-section h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        #centre-map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header transparent -->
+    <header>
+        <nav>
+            <div class="nav-left">
+                <img src="flag.png" alt="Drapeau de la Tunisie" height="50px">
+            </div>
+            <div class="nav-right">
+                <a href="projet.html" class="active">Accueil</a>
+                <!-- Dropdown menu -->
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle">Destination</a>
+                    <div class="dropdown-content">
+                        <a href="nord-details.html">Nord</a>
+                        <a href="centre.html">Centre</a>
+                        <a href="sud.html">Sud</a>
+                    </div>
+                </div>       
+                <a href="contact.html">Contact</a>
+                <div class="search-container">
+                    <input type="text" placeholder="Rechercher..." class="search-bar">
+                    <button class="search-button">🔍</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="region-hero">
+        <h1>Centre de la Tunisie</h1>
+        <p>Entre oasis verdoyantes et vestiges antiques, découvrez le cœur historique et culturel du pays</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="intro-text">
+            <p>Le centre de la Tunisie vous dévoile ses trésors cachés, des cités antiques classées au patrimoine mondial aux paysages steppiques en passant par les villes impériales. Cette région au carrefour des civilisations est un musée à ciel ouvert.</p>
+        </div>
+        
+        <div class="regions-grid">
+            <!-- Sousse -->
+            <div class="region-card">
+                <img src="sousse.jpg" alt="Sousse" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Sousse</h3>
+                    <p class="region-desc">Ville côtière animée avec sa <span class="highlight">médina classée UNESCO</span>, son ribat impressionnant et ses plages de sable fin. Ne manquez pas le musée archéologique qui abrite de superbes mosaïques.</p>
+                    <div class="btn-container">
+                        <a href="sousse.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kairouan -->
+            <div class="region-card">
+                <img src="kairouan.jpg" alt="Kairouan" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Kairouan</h3>
+                    <p class="region-desc">Ville sainte et première capitale musulmane du Maghreb, célèbre pour sa <span class="highlight">Grande Mosquée</span> et ses bassins des Aghlabides. Son centre historique est classé au patrimoine mondial de l'UNESCO.</p>
+                    <div class="btn-container">
+                        <a href="kairouan.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- El Jem -->
+            <div class="region-card">
+                <img src="eljem.jpg" alt="El Jem" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">El Jem</h3>
+                    <p class="region-desc">Site archéologique extraordinaire avec son <span class="highlight">amphithéâtre romain</span>, le troisième plus grand du monde romain. Ce colisée bien conservé témoigne de la grandeur de l'Afrique romaine.</p>
+                    <div class="btn-container">
+                        <a href="el-jem.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monastir -->
+            <div class="region-card">
+                <img src="monastir.jpg" alt="Monastir" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Monastir</h3>
+                    <p class="region-desc">Ville natale de Bourguiba avec son <span class="highlight">ribat imposant</span> et son mausolée présidentiel. La corniche offre une agréable promenade face à la Méditerranée.</p>
+                    <div class="btn-container">
+                        <a href="monastir.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mahdia -->
+            <div class="region-card">
+                <img src="mahdia.jpg" alt="Mahdia" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Mahdia</h3>
+                    <p class="region-desc">Ancienne capitale fatimide avec sa <span class="highlight">Skifa Kahla</span> (porte noire) et ses plages préservées. La pêche y est une tradition vivante et le port coloré vaut le détour.</p>
+                    <div class="btn-container">
+                        <a href="mahdia.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sbeitla -->
+            <div class="region-card">
+                <img src="sbeitla.jpg" alt="Sbeitla" class="region-img">
+                <div class="region-content">
+                    <h3 class="region-title">Sbeitla</h3>
+                    <p class="region-desc">Site archéologique remarquable avec ses <span class="highlight">temples capitulins</span> bien préservés. Cette ancienne cité romaine offre un voyage dans le temps au milieu des oliveraies.</p>
+                    <div class="btn-container">
+                        <a href="sbeitla.html" class="see-more-btn">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Map Section -->
+        <div class="map-section">
+            <h2>Carte des sites incontournables</h2>
+            <div class="map-container">
+                <div id="centre-map"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS pour la carte -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialisation de la carte centrée sur le centre de la Tunisie
+        const map = L.map('centre-map').setView([35.3, 10.2], 8);
+        
+        // Ajout des tuiles OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Ajout des marqueurs pour chaque ville du Centre
+        const cities = [
+            {
+                name: "Sousse",
+                coords: [35.8254, 10.6360],
+                description: "Perle du Sahel",
+                icon: "city"
+            },
+            {
+                name: "Kairouan",
+                coords: [35.6712, 10.1006],
+                description: "Ville sainte",
+                icon: "historic"
+            },
+            {
+                name: "El Jem",
+                coords: [35.2964, 10.7068],
+                description: "Amphithéâtre romain",
+                icon: "historic"
+            },
+            {
+                name: "Monastir",
+                coords: [35.7643, 10.8113],
+                description: "Ville de Bourguiba",
+                icon: "city"
+            },
+            {
+                name: "Mahdia",
+                coords: [35.5047, 11.0622],
+                description: "Ancienne capitale fatimide",
+                icon: "port"
+            },
+            {
+                name: "Sbeitla",
+                coords: [35.2264, 9.1292],
+                description: "Site archéologique",
+                icon: "historic"
+            }
+        ];
+        
+        // Icônes personnalisées (simplifiées)
+        const iconUrls = {
+            city: "https://cdn-icons-png.flaticon.com/512/484/484167.png",
+            historic: "https://cdn-icons-png.flaticon.com/512/2077/2077926.png",
+            village: "https://cdn-icons-png.flaticon.com/512/619/619153.png",
+            port: "https://cdn-icons-png.flaticon.com/512/3130/3130313.png",
+            beach: "https://cdn-icons-png.flaticon.com/512/3464/3464118.png",
+            diving: "https://cdn-icons-png.flaticon.com/512/3163/3163478.png"
+        };
+        
+        // Ajout des marqueurs sur la carte
+        cities.forEach(city => {
+            const customIcon = L.icon({
+                iconUrl: iconUrls[city.icon],
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+            
+            L.marker(city.coords, {icon: customIcon})
+                .addTo(map)
+                .bindPopup(`<b>${city.name}</b><br>${city.description}`);
+        });
+    </script>
+</body>
+</html>
