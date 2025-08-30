@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorer la Tunisie</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-btn:hover {
+            background: #e62222;
+        }
+
+        .back-icon {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="history.back()" class="back-btn">
+        <svg class="back-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Retour</span>
+    </button>
+
+    <!-- Vidéo sans muted et avec gestion du son -->
+    <video autoplay loop playsinline id="mainVideo">
+        <source src="Tunisia.mp4" type="video/mp4">
+        Votre navigateur ne supporte pas la lecture de vidéos.
+    </video>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('mainVideo');
+            
+            // Stratégie pour activer le son
+            function enableSound() {
+                // Essayer de jouer avec son immédiatement
+                video.muted = false;
+                video.play().catch(e => {
+                    console.log("Première tentative échouée, essai avec muet...");
+                    // Fallback: démarrer en muet puis activer le son
+                    video.muted = true;
+                    video.play()
+                        .then(() => {
+                            // Après 1 seconde, essayer d'activer le son
+                            setTimeout(() => {
+                                video.muted = false;
+                            }, 1000);
+                        })
+                        .catch(e => console.error("Erreur de lecture:", e));
+                });
+            }
+            
+            // Activer le son dès que possible
+            if (document.readyState === 'complete') {
+                enableSound();
+            } else {
+                window.addEventListener('load', enableSound);
+                // Activer au premier clic si nécessaire
+                document.addEventListener('click', enableSound, { once: true });
+            }
+        });
+    </script>
+</body>
+</html>
+

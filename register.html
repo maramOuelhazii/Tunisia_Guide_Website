@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - ICOM DIGITAL</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+  <section>
+    <form id="registerForm">
+      <h1>Register</h1>
+      <div class="inputbox">
+        <ion-icon name="person-outline"></ion-icon>
+        <input type="text" required placeholder=" ">
+        <label>Full Name</label>
+      </div>
+      <div class="inputbox">
+        <ion-icon name="mail-outline"></ion-icon>
+        <input type="email" required placeholder=" ">
+        <label>Email</label>
+      </div>
+      <div class="inputbox">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        <input type="password" required placeholder=" ">
+        <label>Password</label>
+      </div>
+      <div class="inputbox">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        <input type="password" required placeholder=" ">
+        <label>Confirm Password</label>
+      </div>
+      <div class="terms">
+        <label><input type="checkbox" required>I agree to the Terms of Service and Privacy Policy</label>
+      </div>
+      <button type="submit">Create Account</button>
+      <div class="register">
+        <p>Already have an account? <a href="login.html">Login</a></p>
+      </div>
+    </form>
+
+    <div id="successMessage" class="success-message">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <h2>Great!</h2>
+      <p>Your account has been created successfully</p>
+      <p>Please check your email for verification</p>
+      <button onclick="window.location.href='projet.html'">Acceuil</button>
+    </div>
+  </section>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      this.style.display = 'none';
+      document.getElementById('successMessage').style.display = 'block';
+    });
+  </script>
+</body>
+</html>
