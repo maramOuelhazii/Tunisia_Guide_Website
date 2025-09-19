@@ -3,7 +3,7 @@
 A modern and responsive web application designed to showcase the beauty of Tunisia — from its golden beaches to its historic ruins.
 The website provides a user-friendly interface with navigation, destination highlights, and search functionality.
 
-#Features
+# Features
 
 Landing Page: A welcoming hero section with background video/image and a clear call-to-action.
 
@@ -21,7 +21,7 @@ Login Button: Redirects users to authentication or member features.
 
 Multilingual Ready: Currently in French but can be adapted for English or other languages.
 
-#Technologies Used
+# Technologies Used
 
 HTML5: Structure and content of the site.
 
@@ -29,7 +29,7 @@ CSS3: Styling, responsiveness, and animations.
 
 JavaScript: Interactivity and dynamic components.
 
-#Installation & Usage
+# Installation & Usage
 
 Clone the repository:
 
@@ -45,7 +45,7 @@ Launch Projet.html in your browser.
 
 No additional setup is required since this is a static front-end project.
 
-#Screenshots
+# Screenshots
 
 Landing Page:(1.png)
 
