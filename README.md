@@ -49,8 +49,8 @@ No additional setup is required since this is a static front-end project.
 
 ![Landing Page:](1.png)
 
-![Destination:](2.png|3.png|4.png|5.png)
+![Destination:](2.png)![Destination:](3.png)![Destination:](4.png)![Destination:](5.png)
 
 ![Contact:](6.png)
 
-![Login:]:(7.png)
+![Login:](7.png)
