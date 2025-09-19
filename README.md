@@ -47,10 +47,10 @@ No additional setup is required since this is a static front-end project.
 
 # Screenshots
 
-Landing Page:(1.png)
+![Landing Page:](1.png)
 
-Destination:(2.png)(3.png)(4.png)(5.png)
+![Destination:](2.png|3.png|4.png|5.png)
 
-Contact:(6.png)
+![Contact:](6.png)
 
-Login:(7.png)
+![Login:]:(7.png)
